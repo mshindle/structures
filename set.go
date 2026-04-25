@@ -11,7 +11,7 @@ type Set[T comparable] struct {
 	m  map[T]struct{}
 }
 
-// NewSet initializes a set with an optional capacity.
+// NewSet initializes a new Set with an optional capacity.
 func NewSet[T comparable](size int) *Set[T] {
 	return &Set[T]{
 		m: make(map[T]struct{}, size),
@@ -62,6 +62,7 @@ func (s *Set[T]) Has(v T) bool {
 }
 
 // All returns an iterator for the set.
+// It uses a read lock to ensure thread-safety during iteration.
 func (s *Set[T]) All() iter.Seq[T] {
 	return func(yield func(T) bool) {
 		// We MUST hold the RLock while iterating to prevent

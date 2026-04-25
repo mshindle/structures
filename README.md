@@ -44,3 +44,48 @@ func main() {
 	}
 }
 ```
+
+## BinaryTree
+
+The `BinaryTree` structure is an ordered collection of elements. It provides an efficient way to store and retrieve data in sorted order.
+
+### Usage
+
+```go
+package main
+
+import (
+	"fmt"
+	"github.com/mshindle/structures"
+)
+
+func main() {
+	// Initialize a new binary tree of integers
+	bt := &structures.BinaryTree[int]{}
+
+	// Add elements
+	bt.Add(5)
+	bt.Add(3)
+	bt.Add(7)
+	bt.Add(3) // Duplicate, will be ignored
+
+	// Print tree structure
+	fmt.Println(bt.Root.String())
+
+	// Iterate over all elements in-order
+	fmt.Println("All elements:")
+	for v := range bt.Root.All() {
+		fmt.Println(v)
+	}
+
+	// Check if two trees are the same
+	bt2 := &structures.BinaryTree[int]{}
+	bt2.Add(5)
+	bt2.Add(3)
+	bt2.Add(7)
+	
+	if bt.Root.Same(bt2.Root) {
+		fmt.Println("Trees are the same")
+	}
+}
+```

@@ -6,20 +6,24 @@ import (
 	"iter"
 )
 
+// BinaryTree represents a binary search tree of ordered elements.
 type BinaryTree[T cmp.Ordered] struct {
 	Root *Tree[T]
 }
 
+// Add inserts a new value into the binary tree.
 func (bt *BinaryTree[T]) Add(v T) {
 	bt.Root = bt.Root.Insert(v)
 }
 
+// Tree represents a node in a binary search tree.
 type Tree[T cmp.Ordered] struct {
 	Left  *Tree[T]
 	Value T
 	Right *Tree[T]
 }
 
+// String returns a string representation of the tree in-order.
 func (t *Tree[T]) String() string {
 	if t == nil {
 		return "()"
@@ -53,6 +57,7 @@ func (t *Tree[T]) Insert(v T) *Tree[T] {
 	return t
 }
 
+// Invert swaps the left and right children of every node in the tree.
 func (t *Tree[T]) Invert() {
 	if t == nil {
 		return
@@ -92,7 +97,8 @@ func (t *Tree[T]) walk(yield func(T) bool) bool {
 	return t.Right.walk(yield)
 }
 
-// ToChannel converts the tree to a channel of values.
+// ToChannel returns a channel that receives the values of the tree in-order.
+// The channel is closed once all values have been sent.
 func (t *Tree[T]) ToChannel(cap int) <-chan T {
 	ch := make(chan T, cap)
 	go func() {
