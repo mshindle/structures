@@ -125,16 +125,6 @@ func (t *Tree[T]) walk(yield func(T) bool) bool {
 	return t.Left.walk(yield) && yield(t.Value) && t.Right.walk(yield)
 }
 
-func (t *Tree[T]) String() string {
-	if t == nil {
-		return "()"
-	}
-	res := t.Value
-	left := t.Left.String()
-	right := t.Right.String()
-	return fmt.Sprintf("(%s %v %s)", left, res, right)
-}
-
 // Invert swaps the left and right children of every node in the tree.
 func (t *Tree[T]) Invert() {
 	if t == nil {

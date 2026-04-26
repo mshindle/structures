@@ -84,6 +84,54 @@ for task, priority := range pq.Drain() {
 
 ---
 
+## List
+A thread-safe singly linked list. Supports O(1) insertions at both ends and removal from the front, making it suitable for stacks and queues.
+
+### Usage
+```go
+import "github.com/mshindle/structures/list"
+
+l := list.New[int]()
+l.PushBack(10)
+l.PushFront(5)
+
+// Fast removal from front (O(1))
+if val, ok := l.PopFront(); ok {
+    fmt.Println("Popped:", val) // 5
+}
+
+// Native for-range iteration
+for val := range l.All() {
+    fmt.Println(val) // 10
+}
+```
+
+---
+
+## RingBuffer
+A fixed-size circular buffer designed for high-throughput telemetry.
+Supports lossy ingestion via `OverwritePush` to ensure the system remains live
+under heavy load.
+
+### Usage
+```go
+import "[github.com/mshindle/structures/ringbuffer](https://github.com/mshindle/structures/ringbuffer)"
+
+rb := ringbuffer.New[float64](1024)
+
+// Standard Push/Pop
+rb.Push(42.5)
+val, _ := rb.Pop()
+
+// High-frequency telemetry (latest data prioritized)
+rb.OverwritePush(101.2)
+
+// Peek at the most recent entry
+latest, _ := rb.PeekTail()
+```
+
+---
+
 ## Installation
 
 ```bash
@@ -99,3 +147,4 @@ go get github.com/mshindle/structures
 2.  **Encapsulation:** In the `BinaryTree` example, I removed `bt.Root.All()` and replaced it with `bt.All()`. The caller shouldn't need to know the tree has a `Root`.
 3.  **Modern Builtins:** Mentioned the `clear` keyword and `iter.Seq` to signal to other developers that this is a modern library.
 4.  **Priority Queue:** Added documentation for the new structure we just finished.
+5.  **List:** Integrated the new generic linked list with native iteration.
