@@ -1,4 +1,4 @@
-package structures
+package set
 
 import (
 	"iter"
@@ -12,7 +12,7 @@ type Set[T comparable] struct {
 }
 
 // NewSet initializes a new Set with an optional capacity.
-func NewSet[T comparable](size int) *Set[T] {
+func New[T comparable](size int) *Set[T] {
 	return &Set[T]{
 		m: make(map[T]struct{}, size),
 	}
@@ -59,6 +59,28 @@ func (s *Set[T]) Has(v T) bool {
 	defer s.mu.RUnlock()
 	_, ok := s.m[v]
 	return ok
+}
+
+// Remove deletes an element from the set.
+func (s *Set[T]) Remove(v T) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	delete(s.m, v)
+}
+
+// Len returns the current number of elements.
+func (s *Set[T]) Len() int {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return len(s.m)
+}
+
+// Clear removes all elements from the set.
+func (s *Set[T]) Clear() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Go 1.24+ optimization: clearing a map is now faster than reallocating
+	clear(s.m)
 }
 
 // All returns an iterator for the set.

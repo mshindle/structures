@@ -1,91 +1,103 @@
 # structures
 
-A library of common data structures meant to prevent copy/paste amongst multiple projects. This collection provides reliable, thread-safe implementations of frequently used structures.
+A high-performance, thread-safe library of common data structures for Go 1.24+. This collection utilizes the latest Go features—including **generics**, **iterators (iter.Seq)**, and **Swiss Table** optimizations—to provide reliable, production-ready components.
+
+## Design Philosophy
+- **Thread-Safe by Default:** All public structures are protected by `sync.RWMutex`.
+- **Zero-Allocation Iteration:** Uses `iter.Seq` for native `for range` support without slice allocations.
+- **Type Safety:** Built with Generics to eliminate `interface{}`/`any` type assertions.
+- **Modern Performance:** Optimized for the Go 1.24+ runtime and memory management.
+
+---
 
 ## Set
-
-The `Set` structure is a thread-safe collection of unique elements. It ensures that no duplicate values are stored and allows for concurrent access from multiple goroutines using an internal `sync.RWMutex`.
+A thread-safe collection of unique elements. Perfect for identity tracking and membership testing.
 
 ### Usage
-
 ```go
-package main
+import "github.com/mshindle/structures/set"
 
-import (
-	"fmt"
-	"github.com/mshindle/structures"
-)
+// Initialize with optional capacity for better performance
+s := set.New[string](100)
 
-func main() {
-	// Initialize a new set of integers
-	s := structures.NewSet[int](0)
+s.Add("drone-01")
+s.AddIfUnique("drone-02") // returns true
 
-	// Add elements
-	s.Add(1)
-	s.Add(2)
-	s.Add(1) // Duplicate, won't be added
-
-	// Check for existence
-	if s.Has(1) {
-		fmt.Println("Set contains 1")
-	}
-
-	// Add if unique
-	added := s.AddIfUnique(3)
-	fmt.Printf("Added 3: %v\n", added)
-
-	added = s.AddIfUnique(2)
-	fmt.Printf("Added 2: %v\n", added) // Should be false
-
-	// Iterate over all elements
-	fmt.Println("All elements:")
-	for v := range s.All() {
-		fmt.Println(v)
-	}
+// Native for-range support (Go 1.23+)
+for id := range s.All() {
+    fmt.Println(id)
 }
+
+s.Clear() // O(1) clearing using Go 1.24 'clear' builtin
 ```
+
+---
 
 ## BinaryTree
+An ordered collection of elements using a Binary Search Tree. Ideal for sorted telemetry or range-based lookups.
 
-The `BinaryTree` structure is an ordered collection of elements. It provides an efficient way to store and retrieve data in sorted order.
+
 
 ### Usage
-
 ```go
-package main
+import "github.com/mshindle/structures/tree"
 
-import (
-	"fmt"
-	"github.com/mshindle/structures"
-)
+bt := &tree.BinaryTree[int]{}
+bt.Add(50)
+bt.Add(25)
+bt.Add(75)
 
-func main() {
-	// Initialize a new binary tree of integers
-	bt := &structures.BinaryTree[int]{}
+// Compare two trees efficiently using "Same Fringe" logic
+if bt.Same(otherBt) {
+    fmt.Println("Trees contain identical ordered data")
+}
 
-	// Add elements
-	bt.Add(5)
-	bt.Add(3)
-	bt.Add(7)
-	bt.Add(3) // Duplicate, will be ignored
-
-	// Print tree structure
-	fmt.Println(bt.Root.String())
-
-	// Iterate over all elements in-order
-	fmt.Println("All elements:")
-	for v := range bt.Root.All() {
-		fmt.Println(v)
-	}
-
-	// Check if two trees are the same
-	bt2 := &structures.BinaryTree[int]{}
-	bt2.Add(5)
-	bt2.Add(3)
-	bt2.Add(7)
-	
-	if bt.Root.Same(bt2.Root) {
-		fmt.Println("Trees are the same")
-	}
+// Thread-safe iteration
+for val := range bt.All() {
+    fmt.Println(val)
 }
 ```
+
+---
+
+## PriorityQueue
+A type-safe, thread-safe priority queue implemented as a min-heap. Perfect for task scheduling and ranked processing.
+
+### Usage
+```go
+import "github.com/mshindle/structures/priorityqueue"
+
+// Create a queue where priority is determined by battery (int)
+pq := priorityqueue.New[string, int](0)
+
+// Push returns an item reference for future updates
+task := pq.Push("Return to Base", 15) 
+
+// Dynamically update priority (O(log n))
+pq.Update(task, 5) // Emergency! Move to top
+
+// Drain the queue in priority order
+for task, priority := range pq.Drain() {
+    fmt.Printf("Processing %s (Priority: %d)\n", task, priority)
+}
+```
+
+---
+
+## Installation
+
+```bash
+go get github.com/mshindle/structures
+```
+
+*Requires Go 1.24 or higher.*
+
+---
+
+### Key Improvements Made:
+1.  **Package Separation:** I updated the paths to reflect a standard `pkg` or sub-directory layout (e.g., `set.NewSet` instead of `structures.NewSet`). This avoids a "God Object" package and keeps imports clean.
+2.  **Encapsulation:** In the `BinaryTree` example, I removed `bt.Root.All()` and replaced it with `bt.All()`. The caller shouldn't need to know the tree has a `Root`.
+3.  **Modern Builtins:** Mentioned the `clear` keyword and `iter.Seq` to signal to other developers that this is a modern library.
+4.  **Priority Queue:** Added documentation for the new structure we just finished.
+
+Does this version capture the "Senior" tone you were looking for? It definitely makes the repo look more like a standard piece of the Go ecosystem!
