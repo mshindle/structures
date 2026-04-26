@@ -1,34 +1,28 @@
 package priorityqueue
 
 import (
-	"container/heap"
+	"slices"
 	"testing"
 )
 
 func TestPriorityQueue_Basic(t *testing.T) {
-	pq := &PriorityQueue[string]{}
-	heap.Init(pq)
+	pq := New[string, int](0)
 
-	items := []*PriorityItem[string]{
-		{value: "orange", priority: 3},
-		{value: "apple", priority: 1},
-		{value: "banana", priority: 2},
-	}
-
-	for _, item := range items {
-		heap.Push(pq, item)
-	}
+	pq.Push("orange", 3)
+	pq.Push("apple", 1)
+	pq.Push("banana", 2)
 
 	if pq.Len() != 3 {
 		t.Errorf("expected Len 3, got %d", pq.Len())
 	}
 
 	expected := []string{"apple", "banana", "orange"}
-	for _, val := range expected {
-		item := heap.Pop(pq).(*PriorityItem[string])
-		if item.value != val {
-			t.Errorf("expected %s, got %s", val, item.value)
+	i := 0
+	for val, _ := range pq.Drain() {
+		if val != expected[i] {
+			t.Errorf("expected %s, got %s", expected[i], val)
 		}
+		i++
 	}
 
 	if pq.Len() != 0 {
@@ -36,106 +30,78 @@ func TestPriorityQueue_Basic(t *testing.T) {
 	}
 }
 
-func TestPriorityQueue_UpdateReceiver(t *testing.T) {
-	pq := &PriorityQueue[string]{}
-	heap.Init(pq)
+func TestPriorityQueue_Update(t *testing.T) {
+	pq := New[string, int](0)
 
-	item := &PriorityItem[string]{value: "initial", priority: 10}
-	heap.Push(pq, item)
-	heap.Push(pq, &PriorityItem[string]{value: "other", priority: 5})
+	item := pq.Push("initial", 10)
+	pq.Push("other", 5)
 
 	// Use the Update receiver
-	pq.Update(item, "updated", 1)
+	pq.Update(item, 1)
 
-	if item.value != "updated" {
-		t.Errorf("expected updated, got %s", item.value)
+	if item.Priority() != 1 {
+		t.Errorf("expected priority 1, got %d", item.Priority())
 	}
 
-	popped := heap.Pop(pq).(*PriorityItem[string])
-	if popped.value != "updated" {
-		t.Errorf("expected updated, got %s", popped.value)
+	val, priority := pq.Pop()
+	if val != "initial" {
+		t.Errorf("expected initial, got %s", val)
 	}
-	if popped.priority != 1 {
-		t.Errorf("expected priority 1, got %d", popped.priority)
-	}
-}
-
-func TestPriorityQueue_Update(t *testing.T) {
-	pq := &PriorityQueue[string]{}
-	heap.Init(pq)
-
-	item := &PriorityItem[string]{value: "initial", priority: 10}
-	heap.Push(pq, item)
-	heap.Push(pq, &PriorityItem[string]{value: "other", priority: 5})
-
-	// Update the priority of "initial" to be highest
-	item.priority = 1
-	heap.Fix(pq, item.index)
-
-	popped := heap.Pop(pq).(*PriorityItem[string])
-	if popped.value != "initial" {
-		t.Errorf("expected initial, got %s", popped.value)
+	if priority != 1 {
+		t.Errorf("expected priority 1, got %d", priority)
 	}
 }
 
-func TestPriorityQueue_Remove(t *testing.T) {
-	pq := &PriorityQueue[string]{}
-	heap.Init(pq)
+func TestPriorityQueue_Pop(t *testing.T) {
+	pq := New[string, int](0)
+	pq.Push("a", 10)
+	pq.Push("b", 5)
+	pq.Push("c", 15)
 
-	item1 := &PriorityItem[string]{value: "item1", priority: 1}
-	item2 := &PriorityItem[string]{value: "item2", priority: 2}
-	item3 := &PriorityItem[string]{value: "item3", priority: 3}
-
-	heap.Push(pq, item1)
-	heap.Push(pq, item2)
-	heap.Push(pq, item3)
-
-	// Remove item2 from the middle
-	removed := heap.Remove(pq, item2.index).(*PriorityItem[string])
-	if removed.value != "item2" {
-		t.Errorf("expected item2, got %s", removed.value)
-	}
-
-	if pq.Len() != 2 {
-		t.Errorf("expected Len 2, got %d", pq.Len())
-	}
-
-	// Check remaining items
-	if p1 := heap.Pop(pq).(*PriorityItem[string]); p1.value != "item1" {
-		t.Errorf("expected item1, got %s", p1.value)
-	}
-	if p3 := heap.Pop(pq).(*PriorityItem[string]); p3.value != "item3" {
-		t.Errorf("expected item3, got %s", p3.value)
+	val, _ := pq.Pop()
+	if val != "b" {
+		t.Errorf("expected b, got %s", val)
 	}
 }
 
 func TestPriorityQueue_EmptyPop(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("expected panic on Pop from empty queue")
-		}
-	}()
+	pq := New[string, int](0)
+	val, priority := pq.Pop()
+	if val != "" || priority != 0 {
+		t.Errorf("expected zero values for empty pop, got %v, %v", val, priority)
+	}
+}
 
-	pq := &PriorityQueue[string]{}
-	heap.Init(pq)
-	heap.Pop(pq)
+func TestPriorityQueue_Drain(t *testing.T) {
+	pq := New[int, int](0)
+	items := []int{5, 3, 8, 1}
+	for _, v := range items {
+		pq.Push(v, v)
+	}
+
+	var got []int
+	for v, _ := range pq.Drain() {
+		got = append(got, v)
+	}
+
+	slices.Sort(items)
+	if !slices.Equal(got, items) {
+		t.Errorf("Drain() = %v, want %v", got, items)
+	}
 }
 
 func TestPriorityQueue_SamePriority(t *testing.T) {
-	pq := &PriorityQueue[string]{}
-	heap.Init(pq)
+	pq := New[string, int](0)
 
-	heap.Push(pq, &PriorityItem[string]{value: "a", priority: 1})
-	heap.Push(pq, &PriorityItem[string]{value: "b", priority: 1})
+	pq.Push("a", 1)
+	pq.Push("b", 1)
 
 	if pq.Len() != 2 {
 		t.Errorf("expected Len 2, got %d", pq.Len())
 	}
 
-	// The order for the same priority is not strictly guaranteed by heap,
-	// but it should at least not crash and return both.
-	heap.Pop(pq)
-	heap.Pop(pq)
+	pq.Pop()
+	pq.Pop()
 
 	if pq.Len() != 0 {
 		t.Errorf("expected Len 0, got %d", pq.Len())

@@ -7,7 +7,7 @@ import (
 )
 
 func TestSet(t *testing.T) {
-	s := NewSet[string](0)
+	s := New[string](0)
 
 	s.Add("apple")
 	s.Add("banana")
@@ -44,7 +44,7 @@ func TestSet(t *testing.T) {
 }
 
 func TestSet_Concurrent(t *testing.T) {
-	s := NewSet[int](0)
+	s := New[int](0)
 	var wg sync.WaitGroup
 	n := 1000
 
