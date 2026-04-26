@@ -99,5 +99,3 @@ go get github.com/mshindle/structures
 2.  **Encapsulation:** In the `BinaryTree` example, I removed `bt.Root.All()` and replaced it with `bt.All()`. The caller shouldn't need to know the tree has a `Root`.
 3.  **Modern Builtins:** Mentioned the `clear` keyword and `iter.Seq` to signal to other developers that this is a modern library.
 4.  **Priority Queue:** Added documentation for the new structure we just finished.
-
-Does this version capture the "Senior" tone you were looking for? It definitely makes the repo look more like a standard piece of the Go ecosystem!
