@@ -1,11 +1,11 @@
-package list
+package structures
 
 import "testing"
 
 var listElements = []string{"alpha", "bravo", "charlie", "delta", "echo"}
 
 func listFromStrings(lstr []string) *List[string] {
-	ll := New[string]()
+	ll := NewList[string]()
 	for i := range lstr {
 		ll.PushBack(lstr[i])
 	}
@@ -29,7 +29,7 @@ func TestList_Create(t *testing.T) {
 }
 
 func TestList_PushFront(t *testing.T) {
-	ll := New[string]()
+	ll := NewList[string]()
 
 	for i := range listElements {
 		ll.PushFront(listElements[i])
@@ -68,7 +68,7 @@ func TestList_PopFront(t *testing.T) {
 }
 
 func TestList_PushBack(t *testing.T) {
-	ll := New[string]()
+	ll := NewList[string]()
 
 	for i := range listElements {
 		ll.PushBack(listElements[i])
@@ -88,7 +88,7 @@ func TestList_PushBack(t *testing.T) {
 }
 
 func TestList_Len(t *testing.T) {
-	ll := New[int]()
+	ll := NewList[int]()
 	if ll.Len() != 0 {
 		t.Fatalf("expected empty list len 0, got %d", ll.Len())
 	}

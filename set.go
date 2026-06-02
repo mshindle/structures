@@ -1,4 +1,4 @@
-package set
+package structures
 
 import (
 	"iter"
@@ -12,7 +12,7 @@ type Set[T comparable] struct {
 }
 
 // NewSet initializes a new Set with an optional capacity.
-func New[T comparable](size int) *Set[T] {
+func NewSet[T comparable](size int) *Set[T] {
 	return &Set[T]{
 		m: make(map[T]struct{}, size),
 	}

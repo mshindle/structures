@@ -1,4 +1,4 @@
-package priorityqueue
+package structures
 
 import (
 	"cmp"
@@ -23,7 +23,7 @@ type PriorityQueue[T any, P cmp.Ordered] struct {
 	impl *pqImpl[T, P]
 }
 
-func New[T any, P cmp.Ordered](capacity int) *PriorityQueue[T, P] {
+func NewPriorityQueue[T any, P cmp.Ordered](capacity int) *PriorityQueue[T, P] {
 	return &PriorityQueue[T, P]{
 		impl: &pqImpl[T, P]{items: make([]*PriorityItem[T, P], 0, capacity)},
 	}

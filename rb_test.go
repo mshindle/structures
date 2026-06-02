@@ -1,4 +1,4 @@
-package ringbuffer
+package structures
 
 import (
 	"errors"
@@ -7,7 +7,7 @@ import (
 )
 
 func TestRingBuffer_New(t *testing.T) {
-	rb := New[int](5)
+	rb := NewRingBuffer[int](5)
 	if rb.Capacity() != 5 {
 		t.Errorf("expected capacity 5, got %d", rb.Capacity())
 	}
@@ -17,7 +17,7 @@ func TestRingBuffer_New(t *testing.T) {
 }
 
 func TestRingBuffer_PushPop(t *testing.T) {
-	rb := New[int](3)
+	rb := NewRingBuffer[int](3)
 
 	// Test basic Push/Pop
 	if err := rb.Push(1); err != nil {
@@ -65,7 +65,7 @@ func TestRingBuffer_PushPop(t *testing.T) {
 }
 
 func TestRingBuffer_TryPush(t *testing.T) {
-	rb := New[int](2)
+	rb := NewRingBuffer[int](2)
 
 	if ok := rb.TryPush(1); !ok {
 		t.Error("TryPush failed to push to empty buffer")
@@ -79,7 +79,7 @@ func TestRingBuffer_TryPush(t *testing.T) {
 }
 
 func TestRingBuffer_OverwritePush(t *testing.T) {
-	rb := New[int](3)
+	rb := NewRingBuffer[int](3)
 
 	rb.OverwritePush(1)
 	rb.OverwritePush(2)
@@ -110,7 +110,7 @@ func TestRingBuffer_OverwritePush(t *testing.T) {
 }
 
 func TestRingBuffer_PeekTail(t *testing.T) {
-	rb := New[int](3)
+	rb := NewRingBuffer[int](3)
 
 	if _, err := rb.PeekTail(); !errors.Is(err, ErrEmpty) {
 		t.Errorf("expected ErrEmpty on empty PeekTail, got %v", err)
@@ -133,7 +133,7 @@ func TestRingBuffer_PeekTail(t *testing.T) {
 }
 
 func TestRingBuffer_Concurrency(t *testing.T) {
-	rb := New[int](100)
+	rb := NewRingBuffer[int](100)
 	var wg sync.WaitGroup
 	numOps := 1000
 

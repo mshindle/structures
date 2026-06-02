@@ -1,4 +1,4 @@
-package ringbuffer
+package structures
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ type RingBuffer[T any] struct {
 	limit int // Maximum capacity
 }
 
-func New[T any](capacity int) *RingBuffer[T] {
+func NewRingBuffer[T any](capacity int) *RingBuffer[T] {
 	return &RingBuffer[T]{
 		data:  make([]T, capacity),
 		limit: capacity,

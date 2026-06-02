@@ -1,4 +1,4 @@
-package priorityqueue
+package structures
 
 import (
 	"slices"
@@ -6,7 +6,7 @@ import (
 )
 
 func TestPriorityQueue_Basic(t *testing.T) {
-	pq := New[string, int](0)
+	pq := NewPriorityQueue[string, int](0)
 
 	pq.Push("orange", 3)
 	pq.Push("apple", 1)
@@ -31,7 +31,7 @@ func TestPriorityQueue_Basic(t *testing.T) {
 }
 
 func TestPriorityQueue_Update(t *testing.T) {
-	pq := New[string, int](0)
+	pq := NewPriorityQueue[string, int](0)
 
 	item := pq.Push("initial", 10)
 	pq.Push("other", 5)
@@ -53,7 +53,7 @@ func TestPriorityQueue_Update(t *testing.T) {
 }
 
 func TestPriorityQueue_Pop(t *testing.T) {
-	pq := New[string, int](0)
+	pq := NewPriorityQueue[string, int](0)
 	pq.Push("a", 10)
 	pq.Push("b", 5)
 	pq.Push("c", 15)
@@ -65,7 +65,7 @@ func TestPriorityQueue_Pop(t *testing.T) {
 }
 
 func TestPriorityQueue_EmptyPop(t *testing.T) {
-	pq := New[string, int](0)
+	pq := NewPriorityQueue[string, int](0)
 	val, priority := pq.Pop()
 	if val != "" || priority != 0 {
 		t.Errorf("expected zero values for empty pop, got %v, %v", val, priority)
@@ -73,7 +73,7 @@ func TestPriorityQueue_EmptyPop(t *testing.T) {
 }
 
 func TestPriorityQueue_Drain(t *testing.T) {
-	pq := New[int, int](0)
+	pq := NewPriorityQueue[int, int](0)
 	items := []int{5, 3, 8, 1}
 	for _, v := range items {
 		pq.Push(v, v)
@@ -91,7 +91,7 @@ func TestPriorityQueue_Drain(t *testing.T) {
 }
 
 func TestPriorityQueue_SamePriority(t *testing.T) {
-	pq := New[string, int](0)
+	pq := NewPriorityQueue[string, int](0)
 
 	pq.Push("a", 1)
 	pq.Push("b", 1)

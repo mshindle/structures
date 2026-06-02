@@ -1,4 +1,4 @@
-package list
+package structures
 
 import (
 	"iter"
@@ -19,7 +19,7 @@ type node[T any] struct {
 	next  *node[T]
 }
 
-func New[T any]() *List[T] {
+func NewList[T any]() *List[T] {
 	return &List[T]{}
 }
 
